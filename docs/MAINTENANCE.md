@@ -9,7 +9,7 @@
 | 插件版本 | dsh 版本 | 状态 |
 | --- | --- | --- |
 | 1.2.x | 0.2.1-rc.2（桌面 + `dsh web`） | 当前维护线 |
-| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.1 未复验此宿主 |
+| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.2 未复验此宿主 |
 | ≤1.1.39 | 0.1.7 及更早 | 冻结，不再改 |
 
 版本规则：dsh 小版本变化 → 插件 minor 进位（1.2.0、1.3.0…）；同一 dsh 线内修 bug → patch 进位。
@@ -25,6 +25,7 @@
 | `lib/index.js` | 运行时插件：system prompt 注入、工具、重启/再应用、状态 |
 | `bin/dsh-purge.js` | 命令行：`--status`、`--check`、`--apply`、`--revert`、`--uninstall` |
 | `.github/workflows/release.yml` | push `master` 后按 `package.json` 版本发 GitHub Release |
+| `scripts/check-runtime.mjs` | 用户内容、YAML 节点、错误终态、卸载与重试回归；使用隔离临时目录并自动清理 |
 | `scripts/check-prompt.mjs` | 读取真实 bundle 配置，用宿主渲染器验证 persona 与未注册变量报错；不调用模型 |
 | `.github/workflows/compat.yml` | 每周对 npm `next` 的 dsh 跑锚点检查和提示词渲染回归 |
 
@@ -43,6 +44,10 @@ CLI 端锚点检查结果可代表桌面端；桌面独有的补丁（#45/#46/#8
 如需完整核对，先解包桌面 asar 再对解包树跑检查。
 
 ### 2. 跑只读兼容检查
+
+先 `npm ci --ignore-scripts --legacy-peer-deps` 安装锁定依赖，再跑 `npm run check:runtime`。
+YAML 编辑用 `yaml` 的语法树和源范围，只替换完整已知默认标量，不按首行/关键词判断用户内容归属。
+解析依据：https://eemeli.org/yaml/#parsing-documents 。
 
 ```sh
 # CLI / web 安装树（npm global 布局示例）
@@ -138,7 +143,7 @@ headless profile 未纳入本插件支持与验收范围，继续不安装；这
 
 ## 本机安装（维护者自用）
 
-本机维护用 **link 软链**，仓库改动即时生效，不需要重装：
+本机维护用 **link 软链**，不需要重新安装插件；源码落盘与当前进程加载是两件事：
 
 ```sh
 # web profile
@@ -147,15 +152,29 @@ dsh plugin --profile web add "link:$HOME/.dsh/plugins/dsh-purge"
 cd "$HOME/.dsh/profiles/desktop" && pnpm add "link:$HOME/.dsh/plugins/dsh-purge"
 ```
 
-只改 bundle 配置或链接插件运行时模块时，通过宿主 profile 重新组合加载；不需要再次「应用」宿主补丁。
-首次安装或宿主补丁变更后，在会话标题旁点 **dsh-purge → 清洗 → 应用**。`应用` 会写宿主
-（桌面端会解包 `app.asar` 到 `resources/app`）并自动重启；助手不要代点、不要重启。
+bundle 配置通过 profile 重新组合加载。1.2.1 → 1.2.2 的旧 guard 包装保留在进程内，
+必须完整重启一次，不能用 HMR 宣称全部生效。插件在已启用 profile 中自动加载，
+无需额外参数。默认 `autoApplyOnStart: false`：自动加载提示词不等于自动改写宿主。
+
+首次安装、宿主升级或磁盘仍有 `app.asar` 时，在会话标题旁点
+**dsh-purge → 清洗 → 应用**；这会改写宿主并重启。普通安装指令不授权助手代点；
+修复任务如果已经明确授权应用与重启，沿用该授权，不重复索取。
+验收必须分别记录：
+
+1. 插件版本与 profile 启用状态；
+2. 宿主磁盘补丁检查、`app.asar` 是否已让位；
+3. 新进程实际从 `Resources/app` 加载、真实新请求成功、规则/skills/工具仍到达模型。
+
+`applied.json` 只记录磁盘操作，不能证明第 3 项。若 `app.asar` 仍存在，即使解包目录
+显示全部已应用，Electron 仍优先加载旧归档。不要把“无需再次 Apply 的提示词修复”
+写成“宿主全部生效”。保留既有账号、模型参数、权限配置、AGENTS.md 和 MCP 开关。
 
 回退：`dsh-purge --revert`（还原已打补丁，保留 `prompt-inject.md`）；卸载：`dsh-purge --uninstall`。
 
 ## CI
 
-`compat.yml` 每周一 02:00 UTC 装 npm `@deepseek-ai/dsh@next` 跑 `--check` 和 `check:prompt`。
+`compat.yml` 每周一 02:00 UTC 装 npm `@deepseek-ai/dsh@next` 跑 `--check`、`check:runtime` 和 `check:prompt`。
+`release.yml` 使用 `package.json.dshTarget` 的精确宿主版本；同样检查通过后才发布。
 按失败项目检查补丁锚点或提示词契约，再执行对应验证并发 patch 版本。也可以手动
 `workflow_dispatch` 触发。
 

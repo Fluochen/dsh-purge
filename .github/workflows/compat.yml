@@ -23,6 +23,11 @@ jobs:
       - name: Install dsh next
         run: npm install -g "@deepseek-ai/dsh@next" --no-audit --no-fund
 
+      - name: Install plugin dependencies and test runtime
+        run: |
+          npm ci --ignore-scripts --legacy-peer-deps --no-audit --no-fund
+          npm run check:runtime
+
       - name: Locate host @deepseek-ai root
         run: |
           set -euo pipefail

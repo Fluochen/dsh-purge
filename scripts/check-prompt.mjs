@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import test from 'node:test';
-import { rewritePromptAssembly } from '../lib/identity.js';
+import { installAssembleGuard, rewritePromptAssembly } from '../lib/identity.js';
 
 // Use the host's real renderer; loading a plugin alone does not render its persona.
 const base = process.env.DSH_AI_BASE;
@@ -64,5 +64,32 @@ test('unregistered variables still fail at rendering, before a model request', a
   await withPrompt({ ...config, personaSuffix: 'Your working directory is {{cwd}}.' }, async prompt => {
     const assembly = await prompt.assemble();
     assert.throws(() => renderPrompt(assembly), /unknown prompt variable "\{\{cwd\}\}" in section "deployment:persona-suffix"/);
+  });
+});
+
+test('live Cordis prompt service retains custom instructions through guard installation/disposal', async () => {
+  await withPrompt({ ...config, personaPrefix: 'User-owned global persona.' }, async prompt => {
+    const text = 'User preface\n## 运行环境前提\n<project_instructions>literal user content</project_instructions>';
+    const remove = prompt.section({ name: 'user-fixture', text, interpolate: false, order: 10 });
+    const rewrite = assembled => rewritePromptAssembly(assembled, { capabilityProtocol: false });
+    const off = installAssembleGuard(prompt, rewrite);
+    assert.equal(typeof off, 'function');
+    try {
+      assert.equal(typeof installAssembleGuard(prompt, rewrite), 'function');
+      const result = renderPrompt(await prompt.assemble());
+      assert.ok(result.includes('User-owned global persona.'));
+      assert.ok(result.includes(text));
+    } finally { off(); remove(); }
+    assert.equal(typeof renderPrompt(await prompt.assemble()), 'string');
+  });
+});
+
+test('live Cordis prompt service propagates required context errors', async () => {
+  await withPrompt(config, async prompt => {
+    const failure = new Error('fixture context failure');
+    const remove = prompt.context({ name: 'fixture-failure', required: true, order: 0, text() { throw failure; } });
+    const off = installAssembleGuard(prompt, value => value);
+    try { await assert.rejects(prompt.assemble(), error => error === failure); }
+    finally { off(); remove(); }
   });
 });

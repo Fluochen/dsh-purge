@@ -1,3 +1,23 @@
+# 1.2.2
+
+## 中文
+
+- 保留用户修改的默认模板、第三方 prompt section 和自定义 persona；普通正文里的红队标题不再触发改写。
+- YAML 使用语法树定位完整标量，修复首行替换吞掉后续规则、误删文档中 YAML 示例的问题；保留注释、换行和锚点，不猜测修补无效配置。
+- 宿主组装失败正常向上传递，避免空上下文假成功；热加载释放旧 guard、全局钩子和待处理重试，保留宿主方法的属性描述符。
+- 新增 14 项运行时回归，真实 Cordis/宿主渲染回归增至 5 项；发布前运行回归及目标宿主检查。
+- 包含 1.2.1 提示词修复。升级后完整重启一次；已有旧包装无法完全热更新。`applied.json` 只代表磁盘状态，桌面还需确认 `app.asar` 已让位且新进程从 `Resources/app` 加载。
+- 不修改账号、模型参数、权限配置、全局 AGENTS.md、skills 或 MCP 开关；headless 仍不在支持范围。
+
+## English
+
+- Preserve user-edited prompt templates, custom personas and third-party sections, including red-team headings quoted as user content.
+- Parse YAML scalar nodes before editing. Preserve custom continuation lines, embedded YAML examples, comments, newlines and anchors; reject invalid configuration instead of deleting orphaned content.
+- Propagate assembly failures instead of returning empty context. Retire guards, global hooks and pending retries on disposal while preserving host property descriptors.
+- Add 14 runtime regressions and expand real Cordis/host rendering coverage to 5 tests; gate releases on tests and target-host compatibility checks.
+- Includes the 1.2.1 prompt fix. Fully restart once after upgrading old wrappers. Disk patch stamps alone do not prove desktop runtime activation.
+- Account, model, permission configuration, global AGENTS.md, skills and MCP switches remain untouched. Headless remains outside the supported scope.
+
 # 1.2.1
 
 ## 中文
