@@ -1,3 +1,17 @@
+# 1.2.1
+
+## 中文
+
+- 修复 dsh 0.2.1-rc.2 桌面/web 发送消息时报 `unknown prompt variable "{{cwd}}"`：清空 bundle 中过时的 `personaSuffix`，并停止运行时 `overlayOfficialIdentity()` 重新注入该后缀；目录由宿主工作目录服务提供。
+- 新增 `DSH_AI_BASE=<宿主 @deepseek-ai 目录> npm run check:prompt`，用真实宿主渲染器检查 bundle persona、字面目录上下文和未知变量错误；兼容 CI 加入此检查。
+- 更新 bundle 配置与运行时后缀处理，不改变宿主补丁、账号或模型参数。重新组合 profile 即可加载，无需再次「清洗 → 应用」。
+
+## English
+
+- Fix desktop/web turns failing with `unknown prompt variable "{{cwd}}"` on dsh 0.2.1-rc.2. Clear the obsolete bundle persona suffix and stop the runtime identity overlay from recreating it; the host working-directory service supplies the directory context.
+- Add `DSH_AI_BASE=<host @deepseek-ai directory> npm run check:prompt` to validate the bundle with the real host renderer, including literal directory context and unknown-variable errors. Run it in compatibility CI.
+- Recompose the profile to load the bundle and runtime module fixes. No host patch reapplication, account changes, or model parameter changes are needed.
+
 # 1.2.0
 
 ## 中文
@@ -9,7 +23,7 @@
 - 新增 `dsh-purge --check [--base <dir>] [--json]`：只读兼容检查，列出宿主版本、可打补丁、锚点漂移；非可选补丁漂移时退出码 `1`，供 CI / 维护脚本使用。
 - 新增 `docs/MAINTENANCE.md` 与每周跟随 npm `next` 的兼容 CI；`release.yml` 改为只在本仓库发版。
 - 元数据、安装地址、`dshTarget` 指向 `y2ambition-ai/dsh-purge`；原作者署名、MIT 与非盈利条款保留。
-- 注意：headless profile 不在支持范围（插件 personaSuffix 使用 `{{cwd}}`，headless 没有该变量，加载会报 unknown prompt variable）。
+- headless profile 未纳入支持范围。此版本遗留的 `{{cwd}}` 在桌面/web 也会导致首轮失败，已由 1.2.1 修复。
 
 ## English
 
@@ -20,7 +34,7 @@
 - New `dsh-purge --check [--base <dir>] [--json]`: read-only compatibility audit (host version, ready patches, drifted anchors); exits `1` on non-optional drift, for CI and maintenance scripts.
 - New `docs/MAINTENANCE.md` and a weekly npm `next` compatibility CI; `release.yml` now publishes only from this repository.
 - Metadata, install URLs, and `dshTarget` point at `y2ambition-ai/dsh-purge`; original attribution, MIT, and the non-commercial terms are retained.
-- Note: the headless profile is out of scope (the plugin's personaSuffix uses `{{cwd}}`; headless has no such variable and fails to load).
+- The headless profile is outside the supported scope. The obsolete `{{cwd}}` reference also breaks desktop/web turns; fixed in 1.2.1.
 
 # 1.1.71
 

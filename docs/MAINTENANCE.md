@@ -9,7 +9,7 @@
 | 插件版本 | dsh 版本 | 状态 |
 | --- | --- | --- |
 | 1.2.x | 0.2.1-rc.2（桌面 + `dsh web`） | 当前维护线 |
-| 1.1.x | 0.2.0-rc.2 | 保留旧锚点，1.2.x 仍可降级兼容 |
+| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.1 未复验此宿主 |
 | ≤1.1.39 | 0.1.7 及更早 | 冻结，不再改 |
 
 版本规则：dsh 小版本变化 → 插件 minor 进位（1.2.0、1.3.0…）；同一 dsh 线内修 bug → patch 进位。
@@ -25,7 +25,8 @@
 | `lib/index.js` | 运行时插件：system prompt 注入、工具、重启/再应用、状态 |
 | `bin/dsh-purge.js` | 命令行：`--status`、`--check`、`--apply`、`--revert`、`--uninstall` |
 | `.github/workflows/release.yml` | push `master` 后按 `package.json` 版本发 GitHub Release |
-| `.github/workflows/compat.yml` | 每周对 npm `next` 的 dsh 跑 `--check`，锚点漂移即失败 |
+| `scripts/check-prompt.mjs` | 读取真实 bundle 配置，用宿主渲染器验证 persona 与未注册变量报错；不调用模型 |
+| `.github/workflows/compat.yml` | 每周对 npm `next` 的 dsh 跑锚点检查和提示词渲染回归 |
 
 ## 升级 dsh 后的维护流程
 
@@ -47,9 +48,11 @@ CLI 端锚点检查结果可代表桌面端；桌面独有的补丁（#45/#46/#8
 # CLI / web 安装树（npm global 布局示例）
 AI="$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai"
 node bin/dsh-purge.js --check --base "$AI"
+DSH_AI_BASE="$AI" npm run check:prompt
 
 # 桌面解包树（插件「应用」后会解到 resources/app）
 node bin/dsh-purge.js --check --base "/Applications/DeepSeek Harness.app/Contents/Resources/app/dsh/node_modules/@deepseek-ai"
+DSH_AI_BASE="/Applications/DeepSeek Harness.app/Contents/Resources/app/dsh/node_modules/@deepseek-ai" npm run check:prompt
 
 # 机器可读
 node bin/dsh-purge.js --check --json > /tmp/dsh-purge-compat.json
@@ -117,9 +120,13 @@ done
 DSH_HOME=/tmp/dsh-purge-home /tmp/dsh-full/lib/bin.js --profile web --port 61235 --host 127.0.0.1 --no-open
 ```
 
-headless profile 不在支持范围：插件 cordis.patch 的 `personaSuffix` 使用 `{{cwd}}`，headless 的
-system prompt 没有该变量，加载会报 `unknown prompt variable "{{cwd}}"` 并退出。不要把插件装进
-headless profile。
+宿主能启动不等于会话能运行：必须完成第 2 节的提示词渲染回归。dsh 0.2.1 的 agent loop
+只注册 `provider` / `model`，桌面与 web 同样不提供 `{{cwd}}`。`personaSuffix` 不应引用它；
+当前目录由 `working-directory:current` 必需上下文提供，并设置 `interpolate: false`。
+测试必须覆盖 `assemble()` → 插件 `rewritePromptAssembly()` → 宿主 `renderPrompt()` 全链路；
+只验证 bundle 配置会漏掉运行时 `overlayOfficialIdentity()` 再次写入过时后缀的错误。
+
+headless profile 未纳入本插件支持与验收范围，继续不安装；这不再以 `cwd` 变量作为原因。
 
 ### 6. 发布
 
@@ -140,15 +147,16 @@ dsh plugin --profile web add "link:$HOME/.dsh/plugins/dsh-purge"
 cd "$HOME/.dsh/profiles/desktop" && pnpm add "link:$HOME/.dsh/plugins/dsh-purge"
 ```
 
-改完 profile 后重启宿主，在会话标题旁点 **dsh-purge → 清洗 → 应用**。`应用` 会写宿主
+只改 bundle 配置或链接插件运行时模块时，通过宿主 profile 重新组合加载；不需要再次「应用」宿主补丁。
+首次安装或宿主补丁变更后，在会话标题旁点 **dsh-purge → 清洗 → 应用**。`应用` 会写宿主
 （桌面端会解包 `app.asar` 到 `resources/app`）并自动重启；助手不要代点、不要重启。
 
 回退：`dsh-purge --revert`（还原已打补丁，保留 `prompt-inject.md`）；卸载：`dsh-purge --uninstall`。
 
 ## CI
 
-`compat.yml` 每周一 02:00 UTC 装 npm `@deepseek-ai/dsh@next` 跑 `--check`。失败表示 dsh 改了目标
-文件或结构：按第 4 节修锚点、跑第 3/5 节验证、发 patch 版本。也可以手动
+`compat.yml` 每周一 02:00 UTC 装 npm `@deepseek-ai/dsh@next` 跑 `--check` 和 `check:prompt`。
+按失败项目检查补丁锚点或提示词契约，再执行对应验证并发 patch 版本。也可以手动
 `workflow_dispatch` 触发。
 
 ## 凭据与安全

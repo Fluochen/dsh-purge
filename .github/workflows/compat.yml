@@ -36,3 +36,6 @@ jobs:
 
       - name: Audit patch anchors
         run: node bin/dsh-purge.js --check --base "$AI_BASE"
+
+      - name: Render bundle persona with host runtime
+        run: DSH_AI_BASE="$AI_BASE" npm run check:prompt
