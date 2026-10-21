@@ -1,8 +1,0 @@
-ci: Release 支持重跑时更新说明并覆盖资产
-
-原发布步骤在检测到 release 已存在时直接 exit 0 跳过，导致资产内容错误时
-无法通过再次 push 修正。改为：release 已存在则用 gh release edit 更新说明，
-随后照常上传资产（--clobber 覆盖同名文件）；不存在才走 release create。
-
-配合上一提交「始终从 $GITHUB_SHA 打包」的改动，重跑一次 push 即可把
-zip 换成与当前 master 一致的内容。
