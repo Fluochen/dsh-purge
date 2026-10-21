@@ -1,0 +1,13 @@
+ci: 修正 Release 打包来源，确保产物与触发 commit 一致
+
+原逻辑在 refs/tags/<tag> 已存在时，用该 tag 指向的 commit 打包，而不是
+本次 push 触发的 commit。tag 被强制更新或先前指向旧 commit 时，会打出
+与本次改动不一致的产物（表现为 zip 里缺少 lib/mnemon-settings.js、
+lib/preset-default.js 等合并引入的文件）。
+
+改为始终从 $GITHUB_SHA（即触发本次 push 的 commit）打包；release 已存在时
+用 gh release create 补建，不存在时用 --target 指向同一 commit，两条路径
+产出一致。
+
+同时保留 tag 已存在/不存在的分支差异：前者直接 create，避免移动已发布
+release 的 target；后者按 pre-release 后缀标记。

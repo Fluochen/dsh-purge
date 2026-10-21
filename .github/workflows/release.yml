@@ -72,12 +72,14 @@ jobs:
             exit 1
           fi
           zip="dsh-purge-${version}.zip"
+          # 始终从触发本次 push 的 commit 打包，不依赖 tag 是否已预存。
+          # 原逻辑在 tag 预先存在时会取 refs/tags/<tag> 指向的旧 commit，
+          # 打出与本次改动不一致的产物。
+          commit="$GITHUB_SHA"
+          git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" "$commit"
           if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
-            commit="$(git rev-parse "refs/tags/${tag}^{}")"
-            git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" "$commit"
             gh release create "$tag" --title "$tag" --notes-file release-notes.md
           else
-            git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" HEAD
             args=(release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes-file release-notes.md)
             case "$version" in
               *beta*|*alpha*|*rc*) args+=(--prerelease) ;;
