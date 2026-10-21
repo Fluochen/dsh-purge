@@ -53,6 +53,7 @@ jobs:
           set -euo pipefail
           target="$(node -p "require('./package.json').dshElectronTarget")"
           npm install --prefix "$RUNNER_TEMP/purge-electron" "electron@$target" --no-audit --no-fund
+          node "$RUNNER_TEMP/purge-electron/node_modules/electron/install.js"
           DSH_ELECTRON_BIN="$RUNNER_TEMP/purge-electron/node_modules/electron/dist/electron" npm run check:desktop
 
       - name: Publish GitHub Release
