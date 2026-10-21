@@ -48,6 +48,13 @@ jobs:
           node bin/dsh-purge.js --check --base "$AI_BASE"
           DSH_AI_BASE="$AI_BASE" npm run check:prompt
 
+      - name: Test archive handoff under real Electron
+        run: |
+          set -euo pipefail
+          target="$(node -p "require('./package.json').dshElectronTarget")"
+          npm install --prefix "$RUNNER_TEMP/purge-electron" "electron@$target" --no-audit --no-fund
+          DSH_ELECTRON_BIN="$RUNNER_TEMP/purge-electron/node_modules/electron/dist/electron" npm run check:desktop
+
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -28,6 +28,13 @@ jobs:
           npm ci --ignore-scripts --legacy-peer-deps --no-audit --no-fund
           npm run check:runtime
 
+      - name: Test archive handoff under real Electron
+        run: |
+          set -euo pipefail
+          target="$(node -p "require('./package.json').dshElectronTarget")"
+          npm install --prefix "$RUNNER_TEMP/purge-electron" "electron@$target" --no-audit --no-fund
+          DSH_ELECTRON_BIN="$RUNNER_TEMP/purge-electron/node_modules/electron/dist/electron" npm run check:desktop
+
       - name: Locate host @deepseek-ai root
         run: |
           set -euo pipefail

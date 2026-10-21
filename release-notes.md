@@ -1,3 +1,17 @@
+# 1.2.4
+
+## 中文
+
+- 修复 macOS/Linux Electron 重启助手用 `node:fs` 将 `app.asar` 误判为目录，导致“已重启”却仍加载旧归档。归档交接统一使用真实磁盘 `original-fs`；状态检查失败不再冒充归档已不存在。
+- 新增真实 Electron 的隔离归档回归：确认实际改名、重复操作幂等、无效目标报错；不启停用户 app。发布与兼容 CI 均加入此回归，Electron 测试版本写在 `dshElectronTarget`。
+- 包含 1.2.1–1.2.3 的提示词、自定义内容保护和生命周期修复。首次完成宿主激活仍需「应用 → 现在重启」，以后随 profile 正常自动加载。
+
+## English
+
+- Fix the Electron restart helper treating `app.asar` as a virtual directory through `node:fs`, falsely reporting a completed restart while still loading the old archive. Use physical `original-fs` APIs for handoff and report stat failures accurately.
+- Add isolated real-Electron regression coverage for archive rename, idempotency and failed handoff; no live app is started or stopped by these tests. Release and compatibility CI use the declared `dshElectronTarget`.
+- Includes the 1.2.1–1.2.3 prompt, user-content and lifecycle fixes. Complete initial host activation with Apply → Restart now; the plugin then loads with its profile.
+
 # 1.2.3
 
 ## 中文

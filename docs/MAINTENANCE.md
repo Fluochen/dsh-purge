@@ -9,7 +9,7 @@
 | 插件版本 | dsh 版本 | 状态 |
 | --- | --- | --- |
 | 1.2.x | 0.2.1-rc.2（桌面 + `dsh web`） | 当前维护线 |
-| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.3 未复验此宿主 |
+| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.4 未复验此宿主 |
 | ≤1.1.39 | 0.1.7 及更早 | 冻结，不再改 |
 
 版本规则：dsh 小版本变化 → 插件 minor 进位（1.2.0、1.3.0…）；同一 dsh 线内修 bug → patch 进位。
@@ -152,7 +152,7 @@ dsh plugin --profile web add "link:$HOME/.dsh/plugins/dsh-purge"
 cd "$HOME/.dsh/profiles/desktop" && pnpm add "link:$HOME/.dsh/plugins/dsh-purge"
 ```
 
-bundle 配置通过 profile 重新组合加载。1.2.1 → 1.2.3 的旧 guard 包装保留在进程内，
+bundle 配置通过 profile 重新组合加载。1.2.1 → 1.2.4 的旧 guard 包装保留在进程内，
 必须完整重启一次，不能用 HMR 宣称全部生效。插件在已启用 profile 中自动加载，
 无需额外参数。默认 `autoApplyOnStart: false`：自动加载提示词不等于自动改写宿主。
 
@@ -164,6 +164,12 @@ bundle 配置通过 profile 重新组合加载。1.2.1 → 1.2.3 的旧 guard �
 1. 插件版本与 profile 启用状态；
 2. 宿主磁盘补丁检查、`app.asar` 是否已让位；
 3. 新进程实际从 `Resources/app` 加载、真实新请求成功、规则/skills/工具仍到达模型。
+
+重启助手必须用 `diskFs()`（Electron `original-fs`）读取归档。普通 `node:fs` 在 Electron
+中把 ASAR 伪装成目录，导致助手跳过改名却报告成功。官方依据：
+https://www.electronjs.org/docs/latest/tutorial/asar-archives#treating-an-asar-archive-as-a-normal-file 。
+`DSH_ELECTRON_BIN=<桌面 Electron 可执行文件> npm run check:desktop` 用 28 字节隔离归档
+验证移动、幂等和失败终态，不启停真实 app；CI 使用 `dshElectronTarget` 对应的 Electron。
 
 `applied.json` 只记录磁盘操作，不能证明第 3 项。若 `app.asar` 仍存在，即使解包目录
 显示全部已应用，Electron 仍优先加载旧归档。不要把“无需再次 Apply 的提示词修复”

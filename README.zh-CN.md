@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.2.3</strong></p>
+<p align="center"><strong>Version 1.2.4</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
@@ -160,12 +160,12 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 ## 适配范围
 
-**1.2.3 修复**：保留用户 persona、自定义提示词和 YAML 文本；组装失败正常报错，热重载释放旧钩子与待处理重试。包含 1.2.1 的 `{{cwd}}` 修复。自动加载随 profile 启动，无需另配参数；从旧版本升级后完整重启一次，旧进程的包装不能完全热替换。桌面宿主补丁需确认 `app.asar` 已让位且新进程从 `Resources/app` 加载，磁盘 `applied` 记录不能代替运行中验证。
+**1.2.4 修复**：保留用户 persona、自定义提示词和 YAML 文本；组装失败正常报错，热重载释放旧钩子与待处理重试。包含 1.2.1 的 `{{cwd}}` 修复。自动加载随 profile 启动，无需另配参数；从旧版本升级后完整重启一次，旧进程的包装不能完全热替换。桌面宿主补丁需确认 `app.asar` 已让位且新进程从 `Resources/app` 加载，磁盘 `applied` 记录不能代替运行中验证。
 
-**1.2.3**（y2ambition-ai 维护版）在当前宿主 **dsh 0.2.1-rc.2**（官方桌面 + `dsh web`）上验证：桌面端与 Web 共用同一份 `@deepseek-ai` 源码，补丁锚点一致。0.2.0 的旧锚点保留，但 1.2.3 未重新验收旧宿主；更早的 0.1.7 使用匹配旧版本。
+**1.2.4**（y2ambition-ai 维护版）在当前宿主 **dsh 0.2.1-rc.2**（官方桌面 + `dsh web`）上验证：桌面端与 Web 共用同一份 `@deepseek-ai` 源码，补丁锚点一致。0.2.0 的旧锚点保留，但 1.2.4 未重新验收旧宿主；更早的 0.1.7 使用匹配旧版本。
 
-- **dsh 0.2.1-rc.2**（官方桌面 / 官方 `dsh web`）：用 **1.2.3**。本页安装命令装的就是这一档。
-- **dsh 0.2.0-rc.2**：使用匹配的旧版（如 1.1.71）；1.2.3 的提示词修复只在 0.2.1-rc.2 验证。
+- **dsh 0.2.1-rc.2**（官方桌面 / 官方 `dsh web`）：用 **1.2.4**。本页安装命令装的就是这一档。
+- **dsh 0.2.0-rc.2**：使用匹配的旧版（如 1.1.71）；1.2.4 的提示词修复只在 0.2.1-rc.2 验证。
 - **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/y2ambition-ai/dsh-purge/releases) 里选对应标签。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。想先确认兼容性再应用：
@@ -202,7 +202,7 @@ dsh plugin --profile desktop add https://github.com/y2ambition-ai/dsh-purge/arch
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.3&repo=y2ambition-ai%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fy2ambition-ai%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.4&repo=y2ambition-ai%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fy2ambition-ai%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步

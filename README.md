@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.2.3</strong></p>
+<p align="center"><strong>Version 1.2.4</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness jailbreak: every model, swap prompts per model. Default prompt for 小码酱. Please star ⭐ If you build on this, see Attribution required.</em>
@@ -160,9 +160,9 @@ WeChat name **「老张的ai科技」**, same handle as the live-room viewer boa
 
 ## Supported hosts
 
-**1.2.3** targets **dsh 0.2.1-rc.2** (desktop and `dsh web`). It preserves custom prompts/YAML, propagates assembly errors and releases retired runtime hooks/retries. It includes the 1.2.1 `{{cwd}}` fix. The plugin loads with its profile; restart the host once after upgrading older wrappers. Disk patch stamps do not establish runtime activation: desktop must load `Resources/app` after `app.asar` is moved aside. Maintenance and read-only checks: [MAINTENANCE.md](docs/MAINTENANCE.md).
+**1.2.4** targets **dsh 0.2.1-rc.2** (desktop and `dsh web`). It preserves custom prompts/YAML, propagates assembly errors and releases retired runtime hooks/retries. It includes the 1.2.1 `{{cwd}}` fix. The plugin loads with its profile; restart the host once after upgrading older wrappers. Disk patch stamps do not establish runtime activation: desktop must load `Resources/app` after `app.asar` is moved aside. Maintenance and read-only checks: [MAINTENANCE.md](docs/MAINTENANCE.md).
 
-- **dsh 0.2.1-rc.2**: use **1.2.3**. The headless profile remains outside the supported scope.
+- **dsh 0.2.1-rc.2**: use **1.2.4**. The headless profile remains outside the supported scope.
 - **dsh 0.2.0-rc.2**: old patch anchors are retained; use the matching release and validate the host before applying.
 - **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/y2ambition-ai/dsh-purge/releases).
 
@@ -193,7 +193,7 @@ Hub one-click on [dsh-plugin.org](https://dsh-plugin.org/plugins/yujunzhixue/dsh
 For the desktop client you can also click the button (`dsh://` deep link):
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.3&repo=y2ambition-ai%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fy2ambition-ai%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.4&repo=y2ambition-ai%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fy2ambition-ai%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>Install in desktop client</strong></a>
 </p>
 
 ### After the command: three steps
