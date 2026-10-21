@@ -14,7 +14,6 @@ concurrency:
 
 jobs:
   release:
-    if: github.repository == 'y2ambition-ai/dsh-purge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,4 +86,4 @@ jobs:
           fi
           test -s "$zip"
           gh release upload "$tag" "$zip" --clobber
-          echo "published https://github.com/y2ambition-ai/dsh-purge/releases/tag/${tag}"
+          echo "published https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
