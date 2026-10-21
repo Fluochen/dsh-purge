@@ -62,10 +62,6 @@ jobs:
           set -euo pipefail
           version="$(node -p "require('./package.json').version")"
           tag="v${version}"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            echo "already published: $tag"
-            exit 0
-          fi
           first="$(head -n 1 release-notes.md | tr -d '\r')"
           if [ "$first" != "# ${version}" ]; then
             echo "release-notes.md 第一行必须是 # ${version}，现在是: ${first}"
@@ -77,14 +73,21 @@ jobs:
           # 打出与本次改动不一致的产物。
           commit="$GITHUB_SHA"
           git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" "$commit"
-          if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
-            gh release create "$tag" --title "$tag" --notes-file release-notes.md
+          if gh release view "$tag" >/dev/null 2>&1; then
+            # 已发布：更新说明并覆盖资产，不改动 release 的 target。
+            echo "release exists: $tag — 更新说明并覆盖资产"
+            gh release edit "$tag" --notes-file release-notes.md
           else
-            args=(release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes-file release-notes.md)
+            args=(release create "$tag" --title "$tag" --notes-file release-notes.md)
             case "$version" in
               *beta*|*alpha*|*rc*) args+=(--prerelease) ;;
             esac
-            gh "${args[@]}"
+            if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
+              gh "${args[@]}"
+            else
+              args+=(--target "$GITHUB_SHA")
+              gh "${args[@]}"
+            fi
           fi
           test -s "$zip"
           gh release upload "$tag" "$zip" --clobber
