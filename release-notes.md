@@ -1,3 +1,27 @@
+# 1.2.0
+
+## 中文
+
+- 版本 **1.2.0**：y2ambition-ai 接管维护后的首个版本，适配 **dsh 0.2.1-rc.2**（官方桌面 + `dsh web`）。
+- 0.2.1 把 Web 面身份句与「不要另开服务器」从 `dsh-web-app` 迁到 `dsh-harness-dev-context`：新增该文件目标，#32 / #53 补新锚点，旧锚点保留。
+- 0.2.1 的 system-prompt 组装新增 `requiredContexts`（runtime context 抑制时只保留 required）：#40 按新结构重写，并保留 required context 过滤。
+- 0.2.1 把回退 append 的 `revised.clear()` 改成带条件：#77 补新锚点。
+- 新增 `dsh-purge --check [--base <dir>] [--json]`：只读兼容检查，列出宿主版本、可打补丁、锚点漂移；非可选补丁漂移时退出码 `1`，供 CI / 维护脚本使用。
+- 新增 `docs/MAINTENANCE.md` 与每周跟随 npm `next` 的兼容 CI；`release.yml` 改为只在本仓库发版。
+- 元数据、安装地址、`dshTarget` 指向 `y2ambition-ai/dsh-purge`；原作者署名、MIT 与非盈利条款保留。
+- 注意：headless profile 不在支持范围（插件 personaSuffix 使用 `{{cwd}}`，headless 没有该变量，加载会报 unknown prompt variable）。
+
+## English
+
+- **1.2.0**: first release maintained by y2ambition-ai; targets **dsh 0.2.1-rc.2** (official desktop and `dsh web`).
+- 0.2.1 moved the web-surface identity sentence and the do-not-start-server line from `dsh-web-app` to `dsh-harness-dev-context`: added the new target file and anchors for #32 / #53; old anchors are retained.
+- 0.2.1's system-prompt assembly added `requiredContexts` (when runtime context is suppressed, only required entries remain): #40 is rewritten for the new shape and keeps the required-context filter.
+- 0.2.1 made the rewind `append` `revised.clear()` conditional: #77 has a new anchor.
+- New `dsh-purge --check [--base <dir>] [--json]`: read-only compatibility audit (host version, ready patches, drifted anchors); exits `1` on non-optional drift, for CI and maintenance scripts.
+- New `docs/MAINTENANCE.md` and a weekly npm `next` compatibility CI; `release.yml` now publishes only from this repository.
+- Metadata, install URLs, and `dshTarget` point at `y2ambition-ai/dsh-purge`; original attribution, MIT, and the non-commercial terms are retained.
+- Note: the headless profile is out of scope (the plugin's personaSuffix uses `{{cwd}}`; headless has no such variable and fails to load).
+
 # 1.1.71
 
 ## 中文

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   release:
-    if: github.repository == 'YuJunZhiXue/dsh-purge'
+    if: github.repository == 'y2ambition-ai/dsh-purge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +26,7 @@ jobs:
           node --check lib/index.js
           node --check lib/core.js
           node --check lib/reapply.js
+          node --check bin/dsh-purge.js
           node --input-type=module -e "import './lib/index.js'"
 
       - name: Publish GitHub Release
@@ -59,4 +60,4 @@ jobs:
           fi
           test -s "$zip"
           gh release upload "$tag" "$zip" --clobber
-          echo "published https://github.com/YuJunZhiXue/dsh-purge/releases/tag/${tag}"
+          echo "published https://github.com/y2ambition-ai/dsh-purge/releases/tag/${tag}"

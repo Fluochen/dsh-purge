@@ -1,0 +1,38 @@
+name: Compatibility
+
+# 跟随 dsh 的 npm next 标签做只读补丁锚点检查。
+# 失败 = 新版 dsh 改了目标文件/结构，需要按 docs/MAINTENANCE.md 修锚点并发版。
+on:
+  schedule:
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dsh next
+        run: npm install -g "@deepseek-ai/dsh@next" --no-audit --no-fund
+
+      - name: Locate host @deepseek-ai root
+        run: |
+          set -euo pipefail
+          dsh --version
+          AI_BASE="$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai"
+          if [ ! -d "$AI_BASE/dsh-base" ]; then
+            AI_BASE="$(find "$(npm root -g)/@deepseek-ai/dsh" -type d -name dsh-base | head -n 1 | xargs dirname)"
+          fi
+          test -d "$AI_BASE/dsh-base"
+          echo "AI_BASE=$AI_BASE" >> "$GITHUB_ENV"
+
+      - name: Audit patch anchors
+        run: node bin/dsh-purge.js --check --base "$AI_BASE"

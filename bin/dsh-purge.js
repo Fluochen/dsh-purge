@@ -36,11 +36,13 @@ function printStatus(state) {
 }
 
 async function main() {
-  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--help"].includes(a));
+  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--check", "--help"].includes(a));
 
   if (mode === "--help" || args.includes("-h")) {
     console.log(`dsh-purge 用法:
   dsh-purge --status     显示状态
+  dsh-purge --check      只读兼容检查：对当前宿主列出已打/可打/锚点漂移的补丁
+                         --base <dir> 指定 @deepseek-ai 根；--json 输出 JSON
   dsh-purge --apply      应用全部清洗（提示词+代码+shim+override）
   dsh-purge --revert     回滚还原
   dsh-purge --uninstall  卸载插件（已应用则先还原）
@@ -49,7 +51,38 @@ async function main() {
     return;
   }
 
+  const baseIdx = args.indexOf("--base");
+  const baseArg = baseIdx >= 0 ? (args[baseIdx + 1] || "") : "";
+
   const state = await core.gatherState();
+  if (mode === "--check") {
+    const aiBase = baseArg || state.ai_base;
+    if (!aiBase) {
+      console.log("[ERROR] 未定位宿主 @deepseek-ai 根，请用 --base <dir> 指定");
+      process.exit(1);
+    }
+    const report = await core.auditHost(aiBase);
+    if (args.includes("--json")) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log("dsh-purge 兼容检查 / Compatibility check");
+      console.log(`  宿主版本 / host   ${report.version || "unknown"}`);
+      console.log(`  插件根 / root     ${report.aiBase}`);
+      console.log(`  补丁 / patches    ${JSON.stringify(report.counts)}`);
+      const pending = report.rows.filter((row) => row.status === "pending");
+      console.log(`  可打 / ready      ${pending.length}`);
+      if (report.actionable.length === 0) {
+        console.log("  ✓ 没有锚点漂移；可选包缺失不算失败。");
+      } else {
+        console.log("  锚点漂移（需按新宿主更新 pattern）：");
+        for (const row of report.actionable) {
+          console.log(`    ✗ [#${String(row.id).padEnd(2)}] ${row.name} — ${row.status}${row.optional ? " (optional)" : ""}`);
+        }
+      }
+    }
+    const failed = report.actionable.filter((row) => !row.optional);
+    process.exit(failed.length > 0 ? 1 : 0);
+  }
   console.log(printStatus(state));
   console.log("");
 
