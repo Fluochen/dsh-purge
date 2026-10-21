@@ -9,7 +9,7 @@
 | 插件版本 | dsh 版本 | 状态 |
 | --- | --- | --- |
 | 1.2.x | 0.2.1-rc.2（桌面 + `dsh web`） | 当前维护线 |
-| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.2 未复验此宿主 |
+| 1.1.x | 0.2.0-rc.2 | 保留旧版本与锚点；1.2.3 未复验此宿主 |
 | ≤1.1.39 | 0.1.7 及更早 | 冻结，不再改 |
 
 版本规则：dsh 小版本变化 → 插件 minor 进位（1.2.0、1.3.0…）；同一 dsh 线内修 bug → patch 进位。
@@ -152,7 +152,7 @@ dsh plugin --profile web add "link:$HOME/.dsh/plugins/dsh-purge"
 cd "$HOME/.dsh/profiles/desktop" && pnpm add "link:$HOME/.dsh/plugins/dsh-purge"
 ```
 
-bundle 配置通过 profile 重新组合加载。1.2.1 → 1.2.2 的旧 guard 包装保留在进程内，
+bundle 配置通过 profile 重新组合加载。1.2.1 → 1.2.3 的旧 guard 包装保留在进程内，
 必须完整重启一次，不能用 HMR 宣称全部生效。插件在已启用 profile 中自动加载，
 无需额外参数。默认 `autoApplyOnStart: false`：自动加载提示词不等于自动改写宿主。
 

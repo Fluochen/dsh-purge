@@ -1,3 +1,15 @@
+# 1.2.3
+
+## 中文
+
+- 完成 1.2.2 生命周期修复的最后一个边界：宿主替换 writable、non-configurable 的 assemble 方法后，卸载清除旧 slot，下一次挂载正常接管新方法。
+- 新增该形态回归，运行时检查共 15 项；沿用 1.2.2 的用户文本保护、错误传播和真实宿主渲染检查。旧版本升级后需完整重启一次。
+
+## English
+
+- Finish the 1.2.2 lifecycle fix: retire stale guard metadata when the host replaces a writable, non-configurable assemble method, so the next mount wraps the replacement correctly.
+- Add the regression (15 runtime tests total). Includes the 1.2.2 user-content preservation, error propagation and host-rendering checks. Fully restart once after upgrading older versions.
+
 # 1.2.2
 
 ## 中文

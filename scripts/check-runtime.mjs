@@ -191,6 +191,22 @@ test('guard preserves readonly and accessor descriptors across assignment/dispos
   assert.deepEqual(Object.getOwnPropertyDescriptor(host, 'assemble'), accessor);
 });
 
+test('fallback guard can remount after the host replaces a non-configurable method', async () => {
+  const host = {};
+  Object.defineProperty(host, 'assemble', { value: async () => assembly(), writable: true });
+  const off = installAssembleGuard(host, value => ({ ...value, owner: 'first' }));
+  assert.equal((await host.assemble()).owner, 'first');
+  const replacement = async () => ({ ...assembly(), hostVersion: 2 });
+  host.assemble = replacement;
+  off();
+  assert.deepEqual(Object.getOwnPropertySymbols(host), []);
+  assert.equal(host.assemble, replacement);
+  const off2 = installAssembleGuard(host, value => ({ ...value, owner: 'second' }));
+  assert.equal((await host.assemble()).owner, 'second');
+  off2();
+  assert.equal(host.assemble, replacement);
+});
+
 test('pending waterfall callbacks and global hooks retire with their plugin instance', async () => {
   const home = mkdtempSync(join(tmpdir(), 'dsh-purge-lifecycle-test-'));
   const before = { DSH_HOME: process.env.DSH_HOME, TMPDIR: process.env.TMPDIR };
