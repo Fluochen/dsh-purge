@@ -1,3 +1,101 @@
+# 1.2.5
+
+## 中文
+
+- 默认值改为 `autoApplyOnStart: true`：宿主启动时自动核对补丁，缺失即重打并自愈重启，不再需要每次手动点「应用」。
+- 适用边界：dsh 版本未变、宿主文件被局部覆盖（npm 重装依赖、profile 重写）时全自动；安装包把 `app.asar` 重新封回来时仍需手动「应用」一次。
+- `autoUpdateOnStart` 保持 `false`：插件目录可能本身就是 git 工作区，自动更新会覆盖本地改动。
+
+## English
+
+- Default `autoApplyOnStart` is now `true`: on host boot the plugin verifies and re-applies missing patches, then self-heals with a restart, so a manual Apply is no longer needed every time.
+- Scope: fully automatic while the dsh version is unchanged and host files were only partially overwritten (npm reinstall, profile rewrite). A reinstall that re-seals `app.asar` still needs one manual Apply.
+- `autoUpdateOnStart` stays `false`: the plugin directory may itself be a git working copy, and auto-update would overwrite local changes.
+
+# 1.2.4
+
+## 中文
+
+- 修复 macOS/Linux Electron 重启助手用 `node:fs` 将 `app.asar` 误判为目录，导致“已重启”却仍加载旧归档。归档交接统一使用真实磁盘 `original-fs`；状态检查失败不再冒充归档已不存在。
+- 新增真实 Electron 的隔离归档回归：确认实际改名、重复操作幂等、无效目标报错；不启停用户 app。发布与兼容 CI 均加入此回归，Electron 测试版本写在 `dshElectronTarget`。
+- 包含 1.2.1–1.2.3 的提示词、自定义内容保护和生命周期修复。首次完成宿主激活仍需「应用 → 现在重启」，以后随 profile 正常自动加载。
+
+## English
+
+- Fix the Electron restart helper treating `app.asar` as a virtual directory through `node:fs`, falsely reporting a completed restart while still loading the old archive. Use physical `original-fs` APIs for handoff and report stat failures accurately.
+- Add isolated real-Electron regression coverage for archive rename, idempotency and failed handoff; no live app is started or stopped by these tests. Release and compatibility CI use the declared `dshElectronTarget`.
+- Includes the 1.2.1–1.2.3 prompt, user-content and lifecycle fixes. Complete initial host activation with Apply → Restart now; the plugin then loads with its profile.
+
+# 1.2.3
+
+## 中文
+
+- 完成 1.2.2 生命周期修复的最后一个边界：宿主替换 writable、non-configurable 的 assemble 方法后，卸载清除旧 slot，下一次挂载正常接管新方法。
+- 新增该形态回归，运行时检查共 15 项；沿用 1.2.2 的用户文本保护、错误传播和真实宿主渲染检查。旧版本升级后需完整重启一次。
+
+## English
+
+- Finish the 1.2.2 lifecycle fix: retire stale guard metadata when the host replaces a writable, non-configurable assemble method, so the next mount wraps the replacement correctly.
+- Add the regression (15 runtime tests total). Includes the 1.2.2 user-content preservation, error propagation and host-rendering checks. Fully restart once after upgrading older versions.
+
+# 1.2.2
+
+## 中文
+
+- 保留用户修改的默认模板、第三方 prompt section 和自定义 persona；普通正文里的红队标题不再触发改写。
+- YAML 使用语法树定位完整标量，修复首行替换吞掉后续规则、误删文档中 YAML 示例的问题；保留注释、换行和锚点，不猜测修补无效配置。
+- 宿主组装失败正常向上传递，避免空上下文假成功；热加载释放旧 guard、全局钩子和待处理重试，保留宿主方法的属性描述符。
+- 新增 14 项运行时回归，真实 Cordis/宿主渲染回归增至 5 项；发布前运行回归及目标宿主检查。
+- 包含 1.2.1 提示词修复。升级后完整重启一次；已有旧包装无法完全热更新。`applied.json` 只代表磁盘状态，桌面还需确认 `app.asar` 已让位且新进程从 `Resources/app` 加载。
+- 不修改账号、模型参数、权限配置、全局 AGENTS.md、skills 或 MCP 开关；headless 仍不在支持范围。
+
+## English
+
+- Preserve user-edited prompt templates, custom personas and third-party sections, including red-team headings quoted as user content.
+- Parse YAML scalar nodes before editing. Preserve custom continuation lines, embedded YAML examples, comments, newlines and anchors; reject invalid configuration instead of deleting orphaned content.
+- Propagate assembly failures instead of returning empty context. Retire guards, global hooks and pending retries on disposal while preserving host property descriptors.
+- Add 14 runtime regressions and expand real Cordis/host rendering coverage to 5 tests; gate releases on tests and target-host compatibility checks.
+- Includes the 1.2.1 prompt fix. Fully restart once after upgrading old wrappers. Disk patch stamps alone do not prove desktop runtime activation.
+- Account, model, permission configuration, global AGENTS.md, skills and MCP switches remain untouched. Headless remains outside the supported scope.
+
+# 1.2.1
+
+## 中文
+
+- 修复 dsh 0.2.1-rc.2 桌面/web 发送消息时报 `unknown prompt variable "{{cwd}}"`：清空 bundle 中过时的 `personaSuffix`，并停止运行时 `overlayOfficialIdentity()` 重新注入该后缀；目录由宿主工作目录服务提供。
+- 新增 `DSH_AI_BASE=<宿主 @deepseek-ai 目录> npm run check:prompt`，用真实宿主渲染器检查 bundle persona、字面目录上下文和未知变量错误；兼容 CI 加入此检查。
+- 更新 bundle 配置与运行时后缀处理，不改变宿主补丁、账号或模型参数。重新组合 profile 即可加载，无需再次「清洗 → 应用」。
+
+## English
+
+- Fix desktop/web turns failing with `unknown prompt variable "{{cwd}}"` on dsh 0.2.1-rc.2. Clear the obsolete bundle persona suffix and stop the runtime identity overlay from recreating it; the host working-directory service supplies the directory context.
+- Add `DSH_AI_BASE=<host @deepseek-ai directory> npm run check:prompt` to validate the bundle with the real host renderer, including literal directory context and unknown-variable errors. Run it in compatibility CI.
+- Recompose the profile to load the bundle and runtime module fixes. No host patch reapplication, account changes, or model parameter changes are needed.
+
+# 1.2.0
+
+## 中文
+
+- 版本 **1.2.0**：y2ambition-ai 接管维护后的首个版本，适配 **dsh 0.2.1-rc.2**（官方桌面 + `dsh web`）。
+- 0.2.1 把 Web 面身份句与「不要另开服务器」从 `dsh-web-app` 迁到 `dsh-harness-dev-context`：新增该文件目标，#32 / #53 补新锚点，旧锚点保留。
+- 0.2.1 的 system-prompt 组装新增 `requiredContexts`（runtime context 抑制时只保留 required）：#40 按新结构重写，并保留 required context 过滤。
+- 0.2.1 把回退 append 的 `revised.clear()` 改成带条件：#77 补新锚点。
+- 新增 `dsh-purge --check [--base <dir>] [--json]`：只读兼容检查，列出宿主版本、可打补丁、锚点漂移；非可选补丁漂移时退出码 `1`，供 CI / 维护脚本使用。
+- 新增 `docs/MAINTENANCE.md` 与每周跟随 npm `next` 的兼容 CI；`release.yml` 改为只在本仓库发版。
+- 元数据、安装地址、`dshTarget` 指向 `y2ambition-ai/dsh-purge`；原作者署名、MIT 与非盈利条款保留。
+- headless profile 未纳入支持范围。此版本遗留的 `{{cwd}}` 在桌面/web 也会导致首轮失败，已由 1.2.1 修复。
+
+## English
+
+- **1.2.0**: first release maintained by y2ambition-ai; targets **dsh 0.2.1-rc.2** (official desktop and `dsh web`).
+- 0.2.1 moved the web-surface identity sentence and the do-not-start-server line from `dsh-web-app` to `dsh-harness-dev-context`: added the new target file and anchors for #32 / #53; old anchors are retained.
+- 0.2.1's system-prompt assembly added `requiredContexts` (when runtime context is suppressed, only required entries remain): #40 is rewritten for the new shape and keeps the required-context filter.
+- 0.2.1 made the rewind `append` `revised.clear()` conditional: #77 has a new anchor.
+- New `dsh-purge --check [--base <dir>] [--json]`: read-only compatibility audit (host version, ready patches, drifted anchors); exits `1` on non-optional drift, for CI and maintenance scripts.
+- New `docs/MAINTENANCE.md` and a weekly npm `next` compatibility CI; `release.yml` now publishes only from this repository.
+- Metadata, install URLs, and `dshTarget` point at `y2ambition-ai/dsh-purge`; original attribution, MIT, and the non-commercial terms are retained.
+- The headless profile is outside the supported scope. The obsolete `{{cwd}}` reference also breaks desktop/web turns; fixed in 1.2.1.
+
 # 1.1.71
 
 ## 中文

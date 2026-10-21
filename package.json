@@ -1,7 +1,7 @@
 {
   "name": "dsh-purge",
-  "version": "1.1.72",
-  "description": "DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分",
+  "version": "1.2.5",
+  "description": "自用攻防测试工具 · 网络安全检查：DeepSeek Harness 插件，提供安全监察面板、红队演练台与按模型切换的提示词规则，只用于本人环境与授权范围。Self-use attack/defense testing tool for checking network security. 原作者 YuJunZhiXue；y2ambition-ai 维护。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -31,12 +31,15 @@
     "screenshots.json",
     "README.md",
     "README.zh-CN.md",
-    "README.en.md",
     "LICENSE"
   ],
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
-    "build:client": "node scripts/build-client.mjs"
+    "build:client": "node scripts/build-client.mjs",
+    "check": "node bin/dsh-purge.js --check",
+    "check:prompt": "node --test scripts/check-prompt.mjs",
+    "check:runtime": "node --test scripts/check-runtime.mjs",
+    "check:desktop": "node --test scripts/check-desktop.mjs"
   },
   "license": "MIT",
   "keywords": [
@@ -56,11 +59,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YuJunZhiXue/dsh-purge.git"
+    "url": "git+https://github.com/y2ambition-ai/dsh-purge.git"
   },
-  "homepage": "https://github.com/YuJunZhiXue/dsh-purge#readme",
+  "homepage": "https://github.com/y2ambition-ai/dsh-purge#readme",
   "bugs": {
-    "url": "https://github.com/YuJunZhiXue/dsh-purge/issues"
+    "url": "https://github.com/y2ambition-ai/dsh-purge/issues"
   },
   "dsh": {
     "bundle": {
@@ -78,9 +81,9 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz",
-      "zip": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip",
-      "git": "https://github.com/YuJunZhiXue/dsh-purge.git"
+      "tarball": "https://github.com/y2ambition-ai/dsh-purge/archive/refs/heads/master.tar.gz",
+      "zip": "https://github.com/y2ambition-ai/dsh-purge/archive/refs/heads/master.zip",
+      "git": "https://github.com/y2ambition-ai/dsh-purge.git"
     }
   },
   "publishConfig": {
@@ -92,5 +95,14 @@
   "engines": {
     "node": ">=18"
   },
-  "dshTarget": "0.2.0-rc.2"
+  "dshTarget": "0.2.1-rc.2",
+  "maintainers": [
+    {
+      "name": "y2ambition-ai"
+    }
+  ],
+  "dependencies": {
+    "yaml": "^2.9.1"
+  },
+  "dshElectronTarget": "44.7.0"
 }

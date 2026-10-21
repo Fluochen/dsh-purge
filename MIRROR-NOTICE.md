@@ -1,7 +1,25 @@
-# 镜像说明 / Mirror Notice
+# 镜像与维护说明 / Mirror & Maintenance Notice
 
 本仓库是 **[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)** 的**全量镜像（mirror）**，
 由 [@mmparko](https://github.com/mmparko) 在上游宣布删库前完整备份，用于存档与分发。
+自 **2026-10-21** 起，本仓库（`y2ambition-ai/dsh-purge`）接管维护，跟随新版 dsh 更新补丁锚点。
+
+本仓库定位：**自用攻防测试工具，用于检查网络安全**——评估本人这套 Harness 的策略与权限边界、在离线靶标或已获授权范围内做攻防演练；不针对未授权目标。
+
+---
+
+## 〇、维护接管 / Maintenance handover
+
+| 项 | 内容 |
+| --- | --- |
+| 上游状态 | 原作者 **YuJunZhiXue** 已公告暂停更新：不再发版、暂不收 issue / PR、不保证跟进新版 dsh |
+| 本仓库 | <https://github.com/y2ambition-ai/dsh-purge>（`master`） |
+| 接管时间 | 2026-10-21 |
+| 维护范围 | 跟随 dsh 新版本修补丁锚点、维护 `dsh-purge --check` 只读兼容检查、更新文档与元数据 |
+| 首个维护版本 | **1.2.0**，适配 dsh **0.2.1-rc.2** |
+| 约束 | 原作者署名、MIT 许可、README 的署名要求与非盈利条款全部保留；不改变原作者内容的归属 |
+
+上游原始内容（接管前）可用 `upstream-snapshot-6c1d638` 完整取回；接管后的改动见 `git log upstream-snapshot-6c1d638..master`。
 
 ---
 
@@ -15,7 +33,8 @@
 | 原许可证 | MIT License（本仓库 `LICENSE` 原样保留，未做任何改动） |
 
 **本项目的名称、思路、代码、提示词的一切权利与署名均归原作者。**
-本镜像不主张任何原创性，仅承担存档与分发职责，未对原作者内容做任何修改或再授权。
+本仓库不主张原作者内容的原创性；接管前的存档零改动，接管后的维护改动（兼容适配、检查工具、
+元数据）由 y2ambition-ai 按同一 MIT 许可与非盈利条款提供，不改变原作者内容的归属。
 
 按原 README「[署名要求](https://github.com/YuJunZhiXue/dsh-purge#署名要求)」章节的明确要求：
 **借用本项目的名称、思路、代码或提示词，必须署名，并写明来源仓库。** 任何基于本镜像的二开、
@@ -38,10 +57,15 @@
 > 说明：GitHub 禁止向 `refs/pull/*` 推送（`deny updating a hidden ref`），
 > 因此上游的 26 个 PR ref 已转换为同 SHA 的 `archive/pr-*` tag，commit 对象一个不少。
 
-### 相对上游的唯一差异
+### 相对上游的差异
 
-`master` 比上游 `master` **多一个 commit**，即本文件 `MIRROR-NOTICE.md`。
-上游原始内容本身零改动，可通过 `upstream-snapshot-6c1d638` 拿到，diff 命令见第四节。
+接管前：`master` 比上游 `master` 只多 `MIRROR-NOTICE.md` 一个 commit。
+2026-10-21 起：`master` 追加维护提交（1.2.0 适配 dsh 0.2.1-rc.2、`--check`、维护文档、元数据）。
+上游原始内容本身零改动，可通过 `upstream-snapshot-6c1d638` 拿到；接管后的改动与该快照的差异：
+
+```sh
+git diff --stat upstream-snapshot-6c1d638..master
+```
 
 ---
 
@@ -101,5 +125,6 @@ diff /tmp/up.txt /tmp/mine.txt
 ## 五、上游 README 中的原生状态说明（保留告知）
 
 上游 README 在备份时载明：**项目暂停更新**，作者因工作安排暂停维护、不再发版、暂不收
-issue / PR，也不保证跟进新版 dsh；仓库仍可自用。该状态与「违规商用公示」章节一并完整保留在
-`README.md` / `README.zh-CN.md` 中，本镜像不修改其任何字句。
+issue / PR，也不保证跟进新版 dsh；仓库仍可自用。该状态说明保留在 `README.md` / `README.zh-CN.md`
+的「维护状态」段落中。上游 README 的「违规商用公示」章节与配图属宣传纠纷内容，已在 1.2.4 之后
+的仓库整理中移除，不涉及上游代码与许可条款的改动。

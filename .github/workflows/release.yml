@@ -14,19 +14,47 @@ concurrency:
 
 jobs:
   release:
-    if: github.repository == 'YuJunZhiXue/dsh-purge'
+    if: github.repository == 'y2ambition-ai/dsh-purge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install plugin dependencies
+        run: npm ci --ignore-scripts --legacy-peer-deps --no-audit --no-fund
+
       - name: Syntax-check plugin entry
         run: |
           node --check lib/index.js
           node --check lib/core.js
           node --check lib/reapply.js
+          node --check bin/dsh-purge.js
           node --input-type=module -e "import './lib/index.js'"
+
+      - name: Runtime regressions
+        run: npm run check:runtime
+
+      - name: Validate declared host compatibility
+        run: |
+          set -euo pipefail
+          target="$(node -p "require('./package.json').dshTarget")"
+          npm install -g "@deepseek-ai/dsh@$target" --no-audit --no-fund
+          AI_BASE="$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai"
+          node bin/dsh-purge.js --check --base "$AI_BASE"
+          DSH_AI_BASE="$AI_BASE" npm run check:prompt
+
+      - name: Test archive handoff under real Electron
+        run: |
+          set -euo pipefail
+          target="$(node -p "require('./package.json').dshElectronTarget")"
+          npm install --prefix "$RUNNER_TEMP/purge-electron" "electron@$target" --no-audit --no-fund
+          node "$RUNNER_TEMP/purge-electron/node_modules/electron/install.js"
+          DSH_ELECTRON_BIN="$RUNNER_TEMP/purge-electron/node_modules/electron/dist/electron" npm run check:desktop
 
       - name: Publish GitHub Release
         env:
@@ -59,4 +87,4 @@ jobs:
           fi
           test -s "$zip"
           gh release upload "$tag" "$zip" --clobber
-          echo "published https://github.com/YuJunZhiXue/dsh-purge/releases/tag/${tag}"
+          echo "published https://github.com/y2ambition-ai/dsh-purge/releases/tag/${tag}"

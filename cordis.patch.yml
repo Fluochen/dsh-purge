@@ -28,7 +28,8 @@
   config:
     includeHarnessIdentity: false
     personaPrefix: ""
-    personaSuffix: Your working directory is {{cwd}}.
+    # dsh supplies cwd through required working-directory context, not a template variable.
+    personaSuffix: ""
 
 - id: dsh-purge
   inject: [systemPrompt, tools]
@@ -39,7 +40,7 @@
       inject: [systemPrompt, tools]
       config:
         enabled: true
-        autoApplyOnStart: false
+        autoApplyOnStart: true
         autoUpdateOnStart: false
         autoRevertOnMissing: false
         injectOnce: false
