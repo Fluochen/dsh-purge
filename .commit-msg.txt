@@ -1,9 +1,0 @@
-ci: 允许本 fork 发布自己的 Release
-
-上游 release job 带仓库守卫（if: github.repository == 'kingcharleslzy-ai/dsh-purge'），
-本 fork 推 tag 时该 job 会被直接跳过，无法产出 Release。本次在守卫里追加本仓库，
-其余发布逻辑（npm pack、SHA256SUMS、三平台 installer 矩阵、--verify-tag）全部沿用上游。
-
-market.yml 的守卫保持不变：往上游插件市场推送只应由上游仓库执行。
-
-本 fork 的 master 已重置到上游 1.6.45，旧的 1.2.5 线保留在 archive/1.2.5-line 分支。
