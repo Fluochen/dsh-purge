@@ -42,7 +42,15 @@ jobs:
         run: |
           set -euo pipefail
           version="$(node -p "require('./package.json').version")"
-          gh release create "$GITHUB_REF_NAME" "dsh-purge-community-$version.tgz" dsh-purge-community.tgz SHA256SUMS.txt --verify-tag --title "Purge Community $version" --notes-file release-notes.md
+          assets="dsh-purge-community-$version.tgz dsh-purge-community.tgz SHA256SUMS.txt"
+          # release 已存在时不能重复 create：改写说明并覆盖同名资产，
+          # 这样重推 tag 就能刷新产物，不会留下 tag 与资产不一致的状态。
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --title "Purge Community $version" --notes-file release-notes.md
+            gh release upload "$GITHUB_REF_NAME" $assets --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" $assets --verify-tag --title "Purge Community $version" --notes-file release-notes.md
+          fi
 
   installer:
     strategy:
