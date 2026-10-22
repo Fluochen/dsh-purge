@@ -10,7 +10,8 @@ concurrency:
 jobs:
   release:
     needs: installer
-    if: github.repository == 'kingcharleslzy-ai/dsh-purge'
+    # 上游只在自己的仓库发布；本 fork 同样需要能发布自己的 tag。
+    if: github.repository == 'kingcharleslzy-ai/dsh-purge' || github.repository == 'Fluochen/dsh-purge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
